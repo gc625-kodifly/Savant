@@ -67,35 +67,35 @@ time.sleep(1)  # Wait for the module to process the frame
 print('Receiving results from the module...')
 
 
-# for result in sink:
-#     print(f'Sink result trace_id {result.trace_id}')
-#     if result.eos:
-#         # second message is the EOS
-#         print('EOS')
-#         # Optionally send a shutdown message to the module
-#         # source.send_shutdown(source_id, shutdown_auth)
-#         break
+for result in sink:
+    print(f'Sink result trace_id {result.trace_id}')
+    if result.eos:
+        # second message is the EOS
+        print('EOS')
+        # Optionally send a shutdown message to the module
+        # source.send_shutdown(source_id, shutdown_auth)
+        break
 
-#     # first message is the module result for the sent JPEG
-#     # check that the result is correct
-#     # for simplicity, we only check the IOU coefs of bounding boxes
-#     for obj in result.frame_meta.get_all_objects():
-#         if obj.label == 'person':
-#             assert (
-#                 obj.detection_box.iou(person_bbox) > 0.9
-#             ), 'Person bbox is not correct'
-#         elif obj.label == 'face':
-#             assert obj.detection_box.iou(face_bbox) > 0.9, 'Face bbox is not correct'
-#     print('Result is correct.')
-#     # get the result image
-#     # the image will be in RGBA format, as specified in the module config
-#     img = np.frombuffer(result.frame_content, dtype=np.uint8)
-#     img = img.reshape(result.frame_meta.height, result.frame_meta.width, 4)
+    # first message is the module result for the sent JPEG
+    # check that the result is correct
+    # for simplicity, we only check the IOU coefs of bounding boxes
+    # for obj in result.frame_meta.get_all_objects():
+    #     if obj.label == 'person':
+    #         assert (
+    #             obj.detection_box.iou(person_bbox) > 0.9
+    #         ), 'Person bbox is not correct'
+    #     elif obj.label == 'face':
+    #         assert obj.detection_box.iou(face_bbox) > 0.9, 'Face bbox is not correct'
+    print('Result is correct.')
+    # get the result image
+    # the image will be in RGBA format, as specified in the module config
+    img = np.frombuffer(result.frame_content, dtype=np.uint8)
+    img = img.reshape(result.frame_meta.height, result.frame_meta.width, 4)
 
-#     # save the result image
-#     # the image will anything that the module has drawn on top of the input image
-#     print(f'Saving result image to {result_img_path}')
-#     cv2.imwrite(result_img_path, cv2.cvtColor(img, cv2.COLOR_RGBA2BGRA))
+    # save the result image
+    # the image will anything that the module has drawn on top of the input image
+    print(f'Saving result image to {result_img_path}')
+    cv2.imwrite(result_img_path, cv2.cvtColor(img, cv2.COLOR_RGBA2BGRA))
 
 #     # print the processing logs from the module
 #     print('Logs from the module:')

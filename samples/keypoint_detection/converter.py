@@ -98,6 +98,8 @@ class YoloV8PoseConverter(BaseComplexModelOutputConverter):
         bboxes = np.concatenate((class_ids, confidences, bboxes), axis=1)
 
         attr_name = model.output.attributes[0].name
+        print(attr_name)
         key_points = [[(attr_name, pts, 1.0)] for pts in key_points]
-
+        print(key_points)
+        
         return bboxes, key_points

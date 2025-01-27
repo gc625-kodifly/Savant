@@ -3,11 +3,11 @@ from typing import Any, List, Optional, Tuple
 import cv2
 import numpy as np
 
-from savant.base.converter import BaseComplexModelOutputConverter
+from savant.base.converter import BaseAttributeModelOutputConverter
 from savant.base.model import AttributeModel
 from savant.base.model import ComplexModel
 
-class TrackNetPoseExtractor(BaseComplexModelOutputConverter):
+class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
 
 
     def __init__(
@@ -31,22 +31,34 @@ class TrackNetPoseExtractor(BaseComplexModelOutputConverter):
     def __call__(
         self,
         *output_layers: np.ndarray,
-        model: ComplexModel,
+        model: AttributeModel,
         roi: Tuple[float, float, float, float],
     ) -> Tuple[np.ndarray, List[List[Tuple[str, Any, float]]]]:
-        
-    
+        # Suppose the model has 1 output layer: a 14xH xW heatmap
         pred = output_layers[0]
-        print(pred.shape)
-        print(pred)
-        points = []
-        # Process heatmaps and find keypoints
-        # for kps_num in range(14):
-        #     heatmap = (pred[kps_num] * 255).astype(np.uint8)  # Convert to uint8 for visualization
+        pred = (pred * 255).astype(np.uint8)
 
-        #     # Postprocess heatmap to find keypoints
-        #     x_pred, y_pred = self.postprocess(heatmap, scale=1, low_thresh=170, max_radius=25)
-        #     points.append((x_pred, y_pred))
+        keypoints = []
+        for i in range(14):
+            heatmap = pred[i]
+            x_pred, y_pred = self.postprocess(heatmap, scale=1, low_thresh=170, max_radius=25)
+            # Convert (x_pred, y_pred) to list so Savant can serialize it
+            keypoints.append([float(x_pred), float(y_pred)])
 
+        # For an attribute model, you usually return nothing for bounding boxes
+        # (an empty float32 array) and a single list of attribute sets
+        bbox_output = np.zeros((0, 6), dtype=np.float32)
 
-        return None, None
+        # The top-level list length must match the number of "objects" you receive.
+        # Typically an attribute model is run on a single parent object at a time,
+        # so we return a list with just one item containing our attributes:
+        # [ [ (attr_name, value, confidence), (attr_name2, value2, confidence), ... ] ]
+
+        attributes_output = [
+            
+                ("keypoints", np.array(keypoints), 1.0)
+            
+        ]
+        print("attrs:",attributes_output)
+
+        return attributes_output 
