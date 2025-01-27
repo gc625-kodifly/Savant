@@ -5,7 +5,8 @@ import numpy as np
 
 from savant.base.converter import BaseAttributeModelOutputConverter
 from savant.base.model import AttributeModel
-from savant.base.model import ComplexModel
+from savant.parameter_storage import param_storage
+FRAME = param_storage()['frame']
 
 class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
 
@@ -39,20 +40,18 @@ class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
         pred = (pred * 255).astype(np.uint8)
 
         keypoints = []
+
+        print("frame:", FRAME)
+        print(pred.shape[1])
+
+        scale = FRAME['height'] // model.input.height
+
         for i in range(14):
             heatmap = pred[i]
-            x_pred, y_pred = self.postprocess(heatmap, scale=1, low_thresh=170, max_radius=25)
+            x_pred, y_pred = self.postprocess(heatmap, scale=scale, low_thresh=170, max_radius=25)
             # Convert (x_pred, y_pred) to list so Savant can serialize it
             keypoints.append([float(x_pred), float(y_pred)])
 
-        # For an attribute model, you usually return nothing for bounding boxes
-        # (an empty float32 array) and a single list of attribute sets
-        bbox_output = np.zeros((0, 6), dtype=np.float32)
-
-        # The top-level list length must match the number of "objects" you receive.
-        # Typically an attribute model is run on a single parent object at a time,
-        # so we return a list with just one item containing our attributes:
-        # [ [ (attr_name, value, confidence), (attr_name2, value2, confidence), ... ] ]
 
         attributes_output = [
             

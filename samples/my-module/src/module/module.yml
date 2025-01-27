@@ -20,8 +20,8 @@ parameters:
 
   # pipeline processing frame parameters
   frame:
-    width: 640
-    height: 360
+    width: 1280
+    height: 720
     # Add paddings to the frame before processing
   output_frame:
     codec: raw-rgba
