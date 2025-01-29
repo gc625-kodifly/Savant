@@ -41,8 +41,8 @@ class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
 
         keypoints = []
 
-        print("frame:", FRAME)
-        print(pred.shape[1])
+        # print("frame:", FRAME)
+        # print(pred.shape[1])
 
         scale = FRAME['height'] // model.input.height
 
@@ -50,7 +50,9 @@ class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
             heatmap = pred[i]
             x_pred, y_pred = self.postprocess(heatmap, scale=scale, low_thresh=170, max_radius=25)
             # Convert (x_pred, y_pred) to list so Savant can serialize it
-            keypoints.append([float(x_pred), float(y_pred)])
+
+            if x_pred is not None and y_pred is not None:
+                keypoints.append([float(x_pred), float(y_pred)])
 
 
         attributes_output = [
@@ -58,6 +60,6 @@ class TrackNetPoseExtractor(BaseAttributeModelOutputConverter):
                 ("keypoints", np.array(keypoints), 1.0)
             
         ]
-        print("attrs:",attributes_output)
+        # print("attrs:",attributes_output)
 
         return attributes_output 

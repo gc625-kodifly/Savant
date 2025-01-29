@@ -24,7 +24,9 @@ parameters:
     height: 720
     # Add paddings to the frame before processing
   output_frame:
-    codec: raw-rgba
+    codec: h264
+    encoder: nvenc
+
   # custom drawing on frames function
   draw_func:
     module: src.module.overlay_custom
@@ -44,7 +46,7 @@ pipeline:
       name: ${parameters.detector}
       model:
         format: onnx
-        local_path: /opt/savant/src/weights
+        # local_path: /opt/savant/src/weights
         model_file: ${parameters.detector}.onnx
         input:
           # model input layer name
@@ -65,7 +67,9 @@ pipeline:
               internal: true
         
     # custom pyfunc element
-    # - element: pyfunc
-    #   module: src.module.custom_pyfunc
-    #   class_name: CustomPyFunc
-      #kwargs:
+    - element: pyfunc
+      module: src.module.custom_pyfunc
+      class_name: BirdsEyeClipper
+      kwargs:
+        codec_params:
+          codec: ${oc.env:CODEC, 'h264'}

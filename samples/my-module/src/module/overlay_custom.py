@@ -22,17 +22,17 @@ class Overlay(NvDsDrawFunc):
 
         # for example, draw a white bounding box around persons
         # and a green bounding box around faces
-        print("WE IN OVERLAY")
-        print(frame_meta.frame_meta)
+        # print("WE IN OVERLAY")
+        # print(frame_meta.frame_meta)
         # print(frame_meta.objects)
         for obj in frame_meta.objects:
             kp_attr = obj.get_attr_meta(DETECTOR, 'keypoints')
-            print(obj.get_attr_meta(DETECTOR, 'keypoints'))
+            # print(obj.get_attr_meta(DETECTOR, 'keypoints'))
             if kp_attr is None:
                 continue
 
             key_points = kp_attr.value
-            print(key_points.shape)
+            # print(key_points.shape)
 
             for pt in key_points:
                 artist.add_circle(
